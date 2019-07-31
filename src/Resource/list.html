@@ -78,8 +78,11 @@
                     method: 'GET'
                 };
                 return {
-                    tableData: Array(10).fill(item)
+                    tableData: [],
                 }
+            },
+            mounted:function(){
+                this.loadList();
             },
             methods: {
                 // 点击导航
@@ -99,23 +102,24 @@
                 },
                 // 重新加载列表
                 loadList() {
-                    axios.post('<?php echo $loadListUrl;?>', {
+                  	let that = this;
+                    axios.post('_LIST_URL_', {
                         firstName: 'Fred',
                         lastName: 'Flintstone'
                     })
                         .then(function (response) {
-                            console.log(response);
+                            const item = {
+                                time: '2019-7-31 22:06:34',
+                                router: '/api/wechat/notify',
+                                method: 'GET2'
+                            };
+                     		console.log(response.data);
+                            that.tableData = response.data
                         })
                         .catch(function (error) {
                             console.log(error);
                         });
 
-                    const item = {
-                        time: '2019-7-31 22:06:34',
-                        router: '/api/wechat/notify',
-                        method: 'GET2'
-                    };
-                    this.tableData = Array(10).fill(item)
                 }
             }
         })
