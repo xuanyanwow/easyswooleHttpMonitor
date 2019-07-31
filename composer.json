@@ -3,7 +3,6 @@
     "description": "easyswoole的HTTP请求监控、复发",
     "type": "l",
     "require": {
-        "easyswoole/easyswoole": "^3.2.0"
     },
     "license": "Apache",
     "authors": [

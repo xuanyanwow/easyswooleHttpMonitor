@@ -7,16 +7,28 @@
  */
 
 require "../vendor/autoload.php";
-
+use Siam\HttpMonitor\Config;
 use Siam\HttpMonitor\Monitor;
 
+$config = new Config([
+    'size'    => 3,
+    'listUrl' => '123',
+]);
 
-$monitor = Monitor::getInstance(4);
+$monitor = new Monitor();
 $monitor->log(['time' => time()]);
 $monitor->log(['time' => time()]);
 $monitor->log(['time' => time()]);
 $monitor->log(['time' => time()]);
 
-$list = $monitor->getList();
 
-var_dump($list);
+// 获取列表
+// $list = $monitor->getList();
+// var_dump($list);
+
+// 列表
+$monitor->listView();
+
+
+// 复发请求
+$monitor->resend();

@@ -8,16 +8,14 @@
 
 namespace Siam\HttpMonitor;
 
-
-use EasySwoole\Spl\SplArray;
-
-
 class LogData
 {
     /** @var array */
     protected $array;
     /** @var int 最大记录长度 */
     private $maxSize;
+    /** @var int 记录现在应该删除的键名 */
+    private $nowDelete = 0;
 
     public function __construct($size = 50)
     {
@@ -38,7 +36,7 @@ class LogData
     {
         // 判断是否已经达到最大记录长度
         $this->checkSize();
-        array_push($this->array, $data);
+        $this->array[] = $data;
     }
 
     private function checkSize()
@@ -47,7 +45,8 @@ class LogData
 
         if ($count >= $this->maxSize){
             // 删除最旧的一个 腾出位置
-            array_shift($this->array);
+            unset($this->array[$this->nowDelete]);
+            $this->nowDelete++;
         }
     }
 }

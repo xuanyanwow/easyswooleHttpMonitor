@@ -9,32 +9,56 @@
 namespace Siam\HttpMonitor;
 
 
-use EasySwoole\Component\Singleton;
-use EasySwoole\Spl\SplArray;
 
 class Monitor
 {
-    use Singleton;
-
     /**
      * @var LogData
      */
     private $logData;
 
-    public function __construct($size)
+    public function __construct(Config $config)
     {
-        $this->logData = new LogData($size);
+        $this->config = $config;
+        $this->logData = new LogData($config->getSize());
         $this->logData->setArray([]);
     }
 
-    function log($data)
+    public function set
+
+    /**
+     * 添加一条记录
+     */
+    public function log($data)
     {
         $this->logData->addOne($data);
     }
 
-    function getList()
+    /**
+     * 获取列表
+     */
+    public function getList()
     {
         $list = $this->logData->getArray();
         return $list;
+    }
+
+    /**
+     * 列表页面
+     */
+    public function listView()
+    {
+        $list = $this->getList();
+        $loadListUrl = $this->config->getListUrl();
+        $tpl  = require(__DIR__ . '/Resource/list.html');
+    }
+
+    /**
+     * 复发某请求
+     */
+    public function resend()
+    {
+        $info = $this->logData->getArray()[3];
+
     }
 }
