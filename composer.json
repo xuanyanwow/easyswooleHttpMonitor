@@ -1,0 +1,21 @@
+{
+    "name": "siam/easyswoole-http-monitor",
+    "description": "easyswoole的HTTP请求监控、复发",
+    "type": "l",
+    "require": {
+        "easyswoole/easyswoole": "^3.2.0"
+    },
+    "license": "Apache",
+    "authors": [
+        {
+            "name": "Siam",
+            "email": "59419979@qq.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Siam\\HttpMonitor\\": "src"
+        }
+    }
+}
