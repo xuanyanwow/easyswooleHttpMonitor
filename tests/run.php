@@ -56,7 +56,7 @@ $http->on('request', function ($request, $response) {
         return $response->end(Monitor::getInstance()->listView());
     }
     if ($request->server['path_info'] == '/resend' || $request->server['request_uri'] == '/resend') {
-        $content = $request->rawContent();
+        $content = $request->getBody()->__toString();
         $content = json_decode($content, true);
         return $response->end(Monitor::getInstance()->resend($content['id']));
     }

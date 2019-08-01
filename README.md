@@ -19,11 +19,11 @@ mainServerCreate方法注册
 use Siam\HttpMonitor\Config as HttpConfig;
 use Siam\HttpMonitor\Monitor;
 
-$config = new Config([
+$config = new HttpConfig([
     'size'      => 20,
-    'listUrl'   => '/get_list',
+    'listUrl'   => '/siam/http-monitor/get_list',
     'temDir'    => getcwd()."/Temp",
-    'resendUrl' => '/resend',
+    'resendUrl' => '/siam/http-monitor/resend',
 ]);
 
 $monitor = Monitor::getInstance($config);
@@ -47,8 +47,6 @@ use Siam\HttpMonitor\Monitor;
 $routeCollector->get('/siam/http-monitor', function (Request $request, Response $response) {
     $monitor = Monitor::getInstance();
     $html = $monitor->listView();
-    $monitor->log(['time' => time()]);
-    $monitor->log(['time' => time()]);
     $response->withHeader('Content-type','text/html;charset=utf-8');
     $response->write("$html");//获取到路由匹配的id
     return false;//不再往下请求,结束此次响应
@@ -63,7 +61,7 @@ $routeCollector->addRoute(['POST', 'GET'], '/siam/http-monitor/get_list', functi
 
 // 复发请求
 $routeCollector->addRoute(['POST'], '/siam/http-monitor/resend', function (Request $request, Response $response) {
-    $content = $request->rawContent();
+    $content = $request->getBody()->__toString();
     $content = json_decode($content, true);
     $response->end(Monitor::getInstance()->resend($content['id']));
     return false;//不再往下请求,结束此次响应
@@ -75,13 +73,13 @@ $routeCollector->addRoute(['POST'], '/siam/http-monitor/resend', function (Reque
 onRequest拦截
 ```
 Monitor::getInstance()->log([
-    'header'     => $request->header,
-    'server'     => $request->server,
-    'get'        => $request->get,
-    'post'       => $request->post,
-    'cookie'     => $request->cookie,
-    'files'      => $request->files,
-    'rawContent' => $request->rawContent(),
-    'data'       => $request->getData(),
+    'header'     => $request->getHeaders(),
+    'server'     => $request->getServerParams(),
+    'get'        => $request->getQueryParams(),
+    'post'       => $request->getParsedBody(),
+    'cookie'     => $request->getCookieParams(),
+    'files'      => $request->getUploadedFiles(),
+    'rawContent' => $request->getBody()->__toString(),
+    'data'       => $request->getSwooleRequest()->getData(),
 ]);
 ```

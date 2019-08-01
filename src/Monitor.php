@@ -96,16 +96,22 @@ class Monitor
     {
         $data = $this->logData->getData()[$id];
         // 复发请求
-        $url = 'http://'. $data['header']['host'].$data['server']['request_uri'];
+        $url = 'http://127.0.0.1:'.$data['server']['server_port'].$data['server']['request_uri'];
         $client = new \EasySwoole\HttpClient\HttpClient();
 
         $client->setUrl($url);
 
         // header
-        $client->setHeaders($data['header'] ?? [], true, false);
+        $headers = $data['header'] ?? [];
+        foreach($headers as $header => $value){
+            $client->setHeader($header, $value[0], false);
+        }
 
         // cookie
-        $client->addCookies($data['cookie'] ?? []);
+        $cookies = $data['cookie'] ?? [];
+        foreach($cookies as $cookie => $value){
+            $client->addCookies([$cookie => $value[0]]);
+        }
 
         switch ($data['server']['request_method']){
             case 'GET':
