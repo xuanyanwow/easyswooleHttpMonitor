@@ -14,10 +14,20 @@
         .el-aside {
             color: #333;
         }
+        .resend_res{
+            width:70%;
+            max-height: 70%;
+            overflow-y: scroll;
+        }
 
         a {
             color: #303133;
             text-decoration: none;
+        }
+        .detail_res{
+            width:70%;
+            max-height: 70%;
+            overflow-y: scroll;
         }
     </style>
 
@@ -44,11 +54,11 @@
                 <el-main>
                     <el-button icon="el-icon-refresh-right" circle @click="loadList()"></el-button>
                     <el-table :data="tableData">
-                        <el-table-column prop="time" label="时间" width="180">
+                        <el-table-column prop="server.request_time" label="时间" width="180" :formatter="dateFormat">
                         </el-table-column>
-                        <el-table-column prop="router" label="路由" width="320">
+                        <el-table-column prop="server.path_info" label="路由" width="320">
                         </el-table-column>
-                        <el-table-column prop="method" label="方式" width="120">
+                        <el-table-column prop="server.request_method" label="方式" width="120">
                         </el-table-column>
                         <el-table-column label="操作">
                             <template slot-scope="scope">
@@ -90,13 +100,45 @@
                 },
                 // 显示请求详情
                 showRequest(row) {
-                    console.log(row);
+
+                    const h = this.$createElement;
+                    let objStr = JSON.stringify(row, null, 4);
+                    let html =  objStr.replace(/\n/g, '<br>').replace(/\s/g, '&nbsp');
+
+
+                    this.$alert(html, "请求查看", {
+                        customClass: "detail_res",
+                        dangerouslyUseHTMLString:true,
+                    });
                 },
                 // 复发请求
                 resendRequest(row) {
+                    let that = this;
                     this.$alert('复发请求', '提示', {
                         confirmButtonText: '确定',
                         callback: action => {
+                            axios.post('_RESEND_URL_', {
+                                id: row.id
+                            }).then(function(response){
+                                const h = that.$createElement;
+                                // that.$msgbox({
+                                //     title: '消息',
+                                //     message: h('div', {style: 'width: 100%;height:600px;max-height:600px;overflow-y:scroll;'}, response.data.body),
+                                //     showCancelButton: true,
+                                //     confirmButtonText: '确定',
+                                //     cancelButtonText: '取消',
+                                //     customClass: "resend_res",
+                                //     beforeClose: (action, instance, done) => {
+                                //         done();
+                                //     }
+                                // });
+                                that.$alert(response.data.body, "复发结果", {
+                                    customClass: "resend_res",
+                                    dangerouslyUseHTMLString:true,
+                                });
+                            }).catch(function (error) {
+
+                            })
                         }
                     });
                 },
@@ -104,21 +146,44 @@
                 loadList() {
                   	let that = this;
                     axios.post('_LIST_URL_', {
-                        firstName: 'Fred',
-                        lastName: 'Flintstone'
                     })
                         .then(function (response) {
-                            const item = {
-                                time: '2019-7-31 22:06:34',
-                                router: '/api/wechat/notify',
-                                method: 'GET2'
-                            };
                      		console.log(response.data);
                             that.tableData = response.data
                         })
                         .catch(function (error) {
                             console.log(error);
                         });
+
+                },
+                dateFormat(row, column, cellValue, index){
+                    const daterc = row.server.request_time
+                    if(daterc!=null){
+                        const dateMat= new Date(parseInt(daterc * 1000));
+                        const year = dateMat.getFullYear();
+                        let month = dateMat.getMonth() + 1;
+                        if (month < 10){
+                            month = "0" + month;
+                        }
+                        let day = dateMat.getDate();
+                        if (day < 10){
+                            day = "0" + day;
+                        }
+                        let hh = dateMat.getHours();
+                        if (hh < 10){
+                            hh = "0" + hh;
+                        }
+                        let mm = dateMat.getMinutes();
+                        if (mm < 10){
+                            mm = "0" + mm;
+                        }
+                        let ss = dateMat.getSeconds();
+                        if (ss < 10){
+                            ss = "0" + ss;
+                        }
+                        let timeFormat= year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
+                        return timeFormat;
+                    }
 
                 }
             }

@@ -10,43 +10,73 @@ namespace Siam\HttpMonitor;
 
 class LogData
 {
-    /** @var array */
-    protected $array;
     /** @var int 最大记录长度 */
     private $maxSize;
-    /** @var int 记录现在应该删除的键名 */
-    private $nowDelete = 0;
+    private $data;
+    protected $temDir;
 
-    public function __construct($size = 50)
+
+    public function __construct()
+    {
+    }
+
+    public function setSize($size)
     {
         $this->maxSize = $size;
     }
 
-    public function getArray()
-    {
-        return $this->array;
-    }
-
-    public function setArray($array): void
-    {
-        $this->array = $array;
-    }
 
     public function addOne($data)
     {
-        // 判断是否已经达到最大记录长度
-        $this->checkSize();
-        $this->array[] = $data;
-    }
+        $fileName = $this->getTemDir()."/siamHttpMonitor.log";
 
-    private function checkSize()
-    {
-        $count = count($this->array);
-
-        if ($count >= $this->maxSize){
-            // 删除最旧的一个 腾出位置
-            unset($this->array[$this->nowDelete]);
-            $this->nowDelete++;
+        if (!is_dir($this->getTemDir())){
+            mkdir($this->getTemDir());
         }
+
+        if (!is_file($fileName)){
+            file_put_contents($fileName,serialize([]));
+        }
+
+        $this->data = unserialize(file_get_contents($fileName));
+
+        if (count($this->data) >= $this->maxSize){
+            // 删除最旧的一个
+            $del = $this->data['nextDelete'] ?? 0;
+            unset($this->data[$del]);
+            $this->data['nextDelete'] = $del +1;
+        }
+
+        $this->data[] = $data;
+
+        file_put_contents($fileName, serialize($this->data));
     }
+
+    public function getData()
+    {
+        $this->data = unserialize(file_get_contents($this->getTemDir()."/siamHttpMonitor.log"));
+
+        unset($this->data['nextDelete']);
+
+        return $this->data ?? [];
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTemDir()
+    {
+        return $this->temDir;
+    }
+
+    /**
+     * @param mixed $temDir
+     */
+    public function setTemDir($temDir): void
+    {
+        $this->temDir = $temDir;
+    }
+
+
+
 }

@@ -15,7 +15,7 @@ $config = new Config([
     'listUrl' => '123',
 ]);
 
-$monitor = new Monitor();
+$monitor = new Monitor($config);
 $monitor->log(['time' => time()]);
 $monitor->log(['time' => time()]);
 $monitor->log(['time' => time()]);

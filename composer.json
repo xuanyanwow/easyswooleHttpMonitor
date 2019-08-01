@@ -1,17 +1,20 @@
 {
     "name": "siam/easyswoole-http-monitor",
+    "type": "library",
     "description": "easyswoole的HTTP请求监控、复发",
-    "type": "l",
+    "keywords" : ["swoole", "framework", "http monitor","easyswoole"],
+    "homepage" : "https://www.siammm.cn",
     "require": {
+        "easyswoole/easyswoole": "^3.2.0",
+        "easyswoole/http-client": "^1.3"
     },
-    "license": "Apache",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "Siam",
             "email": "59419979@qq.com"
         }
     ],
-    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Siam\\HttpMonitor\\": "src"

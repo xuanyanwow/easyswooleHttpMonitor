@@ -8,6 +8,8 @@ class Config extends SplBean
 {
     protected $size;
     protected $listUrl;
+    protected $temDir;
+    protected $resendUrl;
 
     public function getSize()
     {
@@ -28,4 +30,35 @@ class Config extends SplBean
     {
         $this->listUrl = $listUrl;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getTemDir()
+    {
+        return $this->temDir;
+    }
+
+    /**
+     * @param mixed $temDir
+     */
+    public function setTemDir($temDir): void
+    {
+        $this->temDir = $temDir;
+    }
+
+    /**
+     * @param mixed $resendUrl
+     */
+    public function setResendUrl($resendUrl): void
+    {
+        $this->resendUrl = $resendUrl;
+    }
+
+
+    public function getResendUrl()
+    {
+        return $this->resendUrl;
+    }
+
 }
