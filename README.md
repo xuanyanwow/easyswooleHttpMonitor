@@ -19,14 +19,20 @@ mainServerCreate方法注册
 use Siam\HttpMonitor\Config as HttpConfig;
 use Siam\HttpMonitor\Monitor;
 
-
-// HTTP监控
-$config = new HttpConfig([
-    'size'    => 3,
-    'listUrl' => 'http://47.101.149.152:9501/siam/http-monitor/get_list',
+$config = new Config([
+    'size'      => 20,
+    'listUrl'   => '/get_list',
+    'temDir'    => getcwd()."/Temp",
+    'resendUrl' => '/resend',
 ]);
+
 $monitor = Monitor::getInstance($config);
     
+// 添加白名单 无需记录
+$monitor->addFilter('/siam/http-monitor/get_list');
+$monitor->addFilter('/favicon.ico');
+$monitor->addFilter('/siam/http-monitor');
+$monitor->addFilter('/siam/http-monitor/resend');
 ```
 
 
@@ -37,6 +43,7 @@ $monitor = Monitor::getInstance($config);
 use Siam\HttpMonitor\Config;
 use Siam\HttpMonitor\Monitor;
 
+// 主页面
 $routeCollector->get('/siam/http-monitor', function (Request $request, Response $response) {
     $monitor = Monitor::getInstance();
     $html = $monitor->listView();
@@ -47,16 +54,34 @@ $routeCollector->get('/siam/http-monitor', function (Request $request, Response 
     return false;//不再往下请求,结束此次响应
 });
 
+// 获取历史列表
 $routeCollector->addRoute(['POST', 'GET'], '/siam/http-monitor/get_list', function (Request $request, Response $response) {
     $response->withHeader('Content-type','text/html;charset=utf-8');
     $response->write(Monitor::getInstance()->getList());//获取到路由匹配的id
     return false;//不再往下请求,结束此次响应
 });
+
+// 复发请求
+$routeCollector->addRoute(['POST'], '/siam/http-monitor/resend', function (Request $request, Response $response) {
+    $content = $request->rawContent();
+    $content = json_decode($content, true);
+    $response->end(Monitor::getInstance()->resend($content['id']));
+    return false;//不再往下请求,结束此次响应
+});
+
 ```
 
 
 onRequest拦截
 ```
-$monitor = Monitor::getInstance();
-$monitor->log(['time' => time()]);
+Monitor::getInstance()->log([
+    'header'     => $request->header,
+    'server'     => $request->server,
+    'get'        => $request->get,
+    'post'       => $request->post,
+    'cookie'     => $request->cookie,
+    'files'      => $request->files,
+    'rawContent' => $request->rawContent(),
+    'data'       => $request->getData(),
+]);
 ```
