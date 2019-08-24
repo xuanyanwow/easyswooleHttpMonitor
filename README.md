@@ -85,7 +85,7 @@ $routeCollector->addRoute(['POST', 'GET'], '/siam/http-monitor/get_list', functi
 $routeCollector->addRoute(['POST'], '/siam/http-monitor/resend', function (Request $request, Response $response) {
     $content = $request->getBody()->__toString();
     $content = json_decode($content, true);
-    $response->end(Monitor::getInstance()->resend($content['id']));
+    $response->write(Monitor::getInstance()->resend($content['id']));
     return false;//不再往下请求,结束此次响应
 });
 
