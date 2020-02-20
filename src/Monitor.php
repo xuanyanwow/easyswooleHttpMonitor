@@ -1,6 +1,6 @@
 <?php
 /**
- * Created by PhpStorm.
+ * 监控执行门面
  * User: Siam
  * Date: 2019/7/31
  * Time: 17:39
@@ -9,28 +9,31 @@
 namespace Siam\HttpMonitor;
 
 
+use EasySwoole\Component\CoroutineRunner\Runner;
 use EasySwoole\Component\Singleton;
 use EasySwoole\HttpClient\Exception\InvalidUrl;
+use Siam\HttpMonitor\Runner\ArrayRunner;
 
 class Monitor
 {
     use Singleton;
     
     /**
-     * @var LogData
+     * @var RunnerAbstract
      */
-    private $logData;
+    private $runner;
     /** @var Config $config */
     private $config;
     /** @var array 过滤记录的列表 */
     private $filter;
 
-    public function __construct(Config $config)
+    public function __construct(Config $config, RunnerAbstract $runner = null)
     {
-        $this->config  = $config;
-        $this->logData = new LogData();
-        $this->logData->setTemDir($config->getTemDir());
-        $this->logData->setSize($config->getSize());
+        if ($runner === null){
+            $runner = new ArrayRunner($config);
+        }
+        $this->config = $config;
+        $this->runner = $runner;
     }
 
 
@@ -44,7 +47,7 @@ class Monitor
         if (isset($data['server']['request_uri']) && in_array($data['server']['request_uri'], $this->filter)){
             return false;
         }
-        $this->logData->addOne($data);
+        $this->runner->addOne($data);
     }
 
     /**
@@ -61,7 +64,7 @@ class Monitor
      */
     public function getList()
     {
-        $list = $this->logData->getData();
+        $list = $this->runner->getData();
         foreach ($list as $key => $value)
         {
             $list[$key]['id'] = $key;
@@ -94,7 +97,7 @@ class Monitor
      */
     public function resend($id)
     {
-        $data = $this->logData->getData()[$id];
+        $data = $this->runner->getData()[$id];
         // 复发请求
         $url = 'http://127.0.0.1:'.$data['server']['server_port'].$data['server']['request_uri'];
         $client = new \EasySwoole\HttpClient\HttpClient();

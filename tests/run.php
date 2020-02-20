@@ -10,6 +10,7 @@
 require "../vendor/autoload.php";
 use Siam\HttpMonitor\Config;
 use Siam\HttpMonitor\Monitor;
+use Swoole\Http\Request;
 
 
 $config = new Config([
@@ -33,7 +34,7 @@ $http->set([
     'worker_num' => 4,    //worker process num
 ]);
 
-$http->on('request', function ($request, $response) {
+$http->on('request', function (Request $request,\Swoole\Http\Response $response) {
 
     Monitor::getInstance()->log([
         'header'     => $request->header,
@@ -56,11 +57,11 @@ $http->on('request', function ($request, $response) {
         return $response->end(Monitor::getInstance()->listView());
     }
     if ($request->server['path_info'] == '/resend' || $request->server['request_uri'] == '/resend') {
-        $content = $request->getBody()->__toString();
+        $content = $request->rawContent();
         $content = json_decode($content, true);
         return $response->end(Monitor::getInstance()->resend($content['id']));
     }
-    $response->end($request->rawContent() ?? 'siam');
+    $response->end('siam');
 });
 
 $http->start();

@@ -27,8 +27,8 @@ $monitor->log(['time' => time()]);
 // var_dump($list);
 
 // 列表
-$monitor->listView();
+echo $monitor->listView();
 
 
 // 复发请求
-$monitor->resend();
+// $monitor->resend();
