@@ -42,9 +42,8 @@ use Siam\HttpMonitor\Config as HttpConfig;
 use Siam\HttpMonitor\Monitor;
 
 $config = new HttpConfig([
-    'size'      => 20,
+    'size'      => 20, //最大缓存数量
     'listUrl'   => '/siam/http-monitor/get_list',
-    'temDir'    => getcwd()."/Temp",
     'resendUrl' => '/siam/http-monitor/resend',
 ]);
 
