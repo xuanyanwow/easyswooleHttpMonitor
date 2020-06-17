@@ -35,6 +35,12 @@ QQ 59419979
 
 # 使用教程
 
+安装
+
+```
+composer require siam/easyswoole-http-monitor
+```
+
 mainServerCreate方法注册
 ```
 
